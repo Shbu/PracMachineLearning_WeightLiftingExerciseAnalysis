@@ -45,7 +45,7 @@ validData <- trainRawData[,which(NAs == 0)];
 After executing above code, we have received 60 variables are predictors.
 
 
-Step 3: Data Partitioning for Trainind and Testing
+Step 3: Data Partitioning for Training and Testing
 ------------------------------
 To make efficient model, we need to train our model with 70% of given test data. Once model is prepared, it is always good to test it with rest 30% data to cross validate the predicted values against already existing values.
 
@@ -128,7 +128,7 @@ Step 7: Cross Validation
 ------------------------
 As we have splot the data into two sets, we have trained our model with training data. We have out model ready and we have to used rest 30% of data to test the model.
 
-Cleaning:
+#Cleaning:
 I have used same cleaning process which I did for the other 70% data set. Below are the steps for the same. I have carefully removed the non-significant variables such as new_window, user name, timestamp.
 ```
 testData <- validData[-trainIndex,];
@@ -136,14 +136,14 @@ removeIndex <- grep("timestamp|X|user_name|new_window",names(testData));
 testData <- testData[,-removeIndex];
 ```
 
-Predicted Values:
+#Predicted Values:
 Once we have final testing data set, I have used `Predict()` function to predict the `Classe` variable of the testing data set
 
 ```
 predictedValues<-predict(modFitRF,testData);
 ```
 
-Viewing Predicted Values:
+#Viewing Predicted Values:
 Below code shows predicted values in a tabular format.
 
 ```
@@ -151,7 +151,7 @@ View(predictedValues);
 ```
 
 
-Comparing Predicted Values against Actual Classe values of testing data set:
+#Comparing Predicted Values against Actual Classe values of testing data set:
 To cross check the out come of prediction, I added these a column next to Classe for comparision. Further, I took comparision of both by equating them. Comparision column show us if the prediction we did is correct or not. 
 Comparision values:
 TRUE - This means, actual value `classe` and predicted value `predictedValues` are same. Our model worked perfect for this case.
@@ -169,7 +169,7 @@ length(testData$Comparision[testData$Comparision==TRUE]);
 
 
 
-Plotting the values:
+#Plotting the values:
 
 To understand the data in much bettter way, we can even visualize the data using ggplot or qplot.
 
