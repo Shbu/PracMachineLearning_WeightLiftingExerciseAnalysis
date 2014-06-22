@@ -12,6 +12,16 @@ Goal
 Goal of the project is to fit a model with given training data set and predict `classe` variable of the testing data set.
 
 
+Algorithms Testd For better accuracy
+---------------------------------------
+I have trained models using below algorithms and found `RandomForest` works best with applying tuning controls.
+* logistic regression model - GBM
+* lda - linear discriminant analysis 
+* Naive Bayes
+* Random Forest.
+* Parallel Random Forest.
+* Random Forest with tuning control.
+
 Parallel processing to improve speed.
 ----------------------------
 I have used doParallel library and made 4 clusters to do parallel processing. Later I registered these clusters to use them for fitting algorithms.
@@ -116,3 +126,40 @@ The final value used for the model was mtry = 27.
 
 Cross Validation
 ------------------------
+As we have splot the data into two sets, we have trained our model with training data. We have out model ready and we have to used rest 30% of data to test the model.
+
+Cleaning:
+```
+testData <- validData[-trainIndex,];
+removeIndex <- grep("timestamp|X|user_name|new_window",names(testData));
+testData <- testData[,-removeIndex];
+```
+
+Predicted Values:
+```
+predictedValues<-predict(modFitRF,testData);
+```
+
+Viewing Predicted Values:
+
+```
+View(predictedValues);
+```
+
+
+Comparing Predicted Values against Actual Classe values of testing data set:
+
+```
+testData$predictedValues<-predictedValues;
+testData$Comparision<-testData$predictedValues==testData$classe;
+
+length(testData$Comparision[testData$Comparision==FALSE]);
+length(testData$Comparision[testData$Comparision==TRUE]);
+```
+
+
+
+Plotting the values:
+```
+qplot(testData$classe,testData$predictedValues, color=testData$Comparision);
+```
