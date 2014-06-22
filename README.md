@@ -14,7 +14,7 @@ Goal of the project is to fit a model with given training data set and predict `
 
 Algorithms Testd For better accuracy
 ---------------------------------------
-I have trained models using below algorithms and found `RandomForest` works best with applying tuning controls.
+To achieve the goal, I have trained models using below algorithms. After repeated trials and tuning process, for our dataset, I found  `RandomForest` to be working best after applying tuning controls.
 * logistic regression model - GBM
 * lda - linear discriminant analysis 
 * Naive Bayes
@@ -22,7 +22,7 @@ I have trained models using below algorithms and found `RandomForest` works best
 * Parallel Random Forest.
 * Random Forest with tuning control.
 
-Parallel processing to improve speed.
+Step 1: Tweaking machine for Parallel processing to improve speed.
 ----------------------------
 I have used doParallel library and made 4 clusters to do parallel processing. Later I registered these clusters to use them for fitting algorithms.
 
@@ -32,7 +32,7 @@ rCluster <- makePSOCKcluster(4);
 registerDoParallel(rCluster);
 ```
 
-Source, Cleaning and Processing Data
+Step 2: Source, Cleaning and Processing Data
 --------------------------
 Imported pml-training.csv into workspace and assigned those values to trainRawData variable. In further steps, I cleaned data by removing columns with NA's from dataset. This is done to reduce the number of insignificant columns thereby improving the processing time and accuracy.
 
@@ -45,7 +45,7 @@ validData <- trainRawData[,which(NAs == 0)];
 After executing above code, we have received 60 variables are predictors.
 
 
-Data Partitioning for Trainind and Testing
+Step 3: Data Partitioning for Trainind and Testing
 ------------------------------
 To make efficient model, we need to train our model with 70% of given test data. Once model is prepared, it is always good to test it with rest 30% data to cross validate the predicted values against already existing values.
 
@@ -60,7 +60,7 @@ I have used caret createDataPartition method in caret package to split data into
 
 CreatedDataPartition functions gives indices of split data. 
 
-Further Cleaning
+Step 4: Further Cleaning
 ------------------------
 
 According to the details mentioned in http://groupware.les.inf.puc-rio.br/har it is understood that timestamps, username and other details are not highly significant in predicting the Classe variable of the dataset. So, accordingly, I have removed the irrelevant variables using Grep function.
@@ -77,7 +77,7 @@ After complete cleansing, we got trainData which has below details.
 *    5 classes: 'A', 'B', 'C', 'D', 'E'
 
 
-Model Fitting
+Step 5: Model Fitting
 ---------------------
 I have used Random Forest as algorithm to get highest accuracy with available 53 predictor variables. To control the training process, trControl function is used with Cross Validation as method and parallel processing also set to true.
 
@@ -90,7 +90,7 @@ I have passed all variables as predictor variable except classe to train functio
 
 This model fitting took approximately 45 minutes on a Windows Machine with 64 Bit Chipset, i5, 4 Gigabytes of Ram.
 
-Model details
+Step 6: Model details
 -----------------
 To look more into model, i excuted below command and found that this model is 99.6% accurate at mtry 27. Thus this would be most efficient model in predicitng our test values.
 
@@ -124,11 +124,12 @@ The final value used for the model was mtry = 27.
 
 
 
-Cross Validation
+Step 7: Cross Validation
 ------------------------
 As we have splot the data into two sets, we have trained our model with training data. We have out model ready and we have to used rest 30% of data to test the model.
 
 Cleaning:
+I have used same cleaning process which I did for the other 70% data set. Below are the steps for the same. I have carefully removed the non-significant variables such as new_window, user name, timestamp.
 ```
 testData <- validData[-trainIndex,];
 removeIndex <- grep("timestamp|X|user_name|new_window",names(testData));
@@ -136,11 +137,14 @@ testData <- testData[,-removeIndex];
 ```
 
 Predicted Values:
+Once we have final testing data set, I have used `Predict()` function to predict the `Classe` variable of the testing data set
+
 ```
 predictedValues<-predict(modFitRF,testData);
 ```
 
 Viewing Predicted Values:
+Below code shows predicted values in a tabular format.
 
 ```
 View(predictedValues);
@@ -148,6 +152,12 @@ View(predictedValues);
 
 
 Comparing Predicted Values against Actual Classe values of testing data set:
+To cross check the out come of prediction, I added these a column next to Classe for comparision. Further, I took comparision of both by equating them. Comparision column show us if the prediction we did is correct or not. 
+Comparision values:
+TRUE - This means, actual value `classe` and predicted value `predictedValues` are same. Our model worked perfect for this case.
+FALSE - Actual value and predicted value are different. Model was not good enough to predict that particular case.
+But it'll be difficult to check each and every row for TRUE or FALSE. So I took total count of case in each segment (TRUE or FALSE). I have used `length()` function to get total count.
+
 
 ```
 testData$predictedValues<-predictedValues;
@@ -160,6 +170,9 @@ length(testData$Comparision[testData$Comparision==TRUE]);
 
 
 Plotting the values:
+
+To understand the data in much bettter way, we can even visualize the data using ggplot or qplot.
+
 ```
 qplot(testData$classe,testData$predictedValues, color=testData$Comparision);
 ```
@@ -167,3 +180,10 @@ qplot(testData$classe,testData$predictedValues, color=testData$Comparision);
 ```
 qplot(length(testData$Classe), color=testData$Comparision);
 ```
+
+
+Conclusion
+------------------------
+Random Forest algorithm works best for our Weight Lifting exercise analysis.
+
+
