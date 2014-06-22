@@ -163,3 +163,7 @@ Plotting the values:
 ```
 qplot(testData$classe,testData$predictedValues, color=testData$Comparision);
 ```
+
+```
+qplot(length(testData$Classe), color=testData$Comparision);
+```
