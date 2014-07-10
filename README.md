@@ -1,6 +1,9 @@
-PracMachineLearning_WeightLiftingExerciseAnalysis
+PracticalMachineLearning_WeightLiftingExerciseAnalysis
 ------------------------------------------------------------
-PracMachineLearning - WeightLiftingExerciseAnalysis
+PracticalMachineLearning - WeightLiftingExerciseAnalysis
+
+
+This project deals with analysing existing data and developing predictive models using Algorithms(supervised learning) in CARET Package of R programming language. These models will be used to predict outcome of new data.
 
 
 Description
