@@ -51,89 +51,74 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div class="container-fluid main-container">
 
 
-
-
-<div id="practical-machine-learning---weight-lifting-exercise-analysis" class="section level3">
-<h3>Practical Machine Learning - Weight Lifting Exercise Analysis</h3>
-<div id="practical-machine-learning---weight-lifting-exercise-analysis-1" class="section level4">
-<h4>Practical Machine Learning - Weight Lifting Exercise Analysis</h4>
-<p>© 2014 Sharan Babu Katragadda</p>
-<p>This project deals with analysing existing data and developing predictive models using Algorithms (supervised learning and Unsupervised Learning) in CARET Package of R programming language. These models will be used to predict outcome of new data.</p>
+<div id="pracmachinelearning_weightliftingexerciseanalysis" class="section level2">
+<h1>Usage of Machine Learning Algorithms to predict unknown data - Weight Lifting Exercise Analysis</h1>
+<p>PracMachineLearning - WeightLiftingExerciseAnalysis</p>
 </div>
-<div id="description" class="section level4">
-<h4>Description:</h4>
-<p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement. A group of enthusiasts took measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.</p>
-<p>Goal of this project is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. This data was recorded at regular intervals. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).</p>
+
+<div id="header">
+<h3 class="title">pml-project-script.R</h3>
+<h4 class="author"><em>Author Details:</em></h4>
+<h5 class="author"><em>Sharan Babu Katragadda</em></h4>
+<h5 class="date"><em>Sun Jun 22 13:36:02 2014</em></h4>
 </div>
-<div id="goal" class="section level4">
-<h4>Goal:</h4>
+
+<div id="description" class="section level2">
+<h2>Description</h2>
+<p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement. A group of enthusiasts took measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.
+Goal of this project is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. This data was recorded at regular intervals. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).</p>
+</div>
+<div id="goal" class="section level2">
+<h2>Goal</h2>
 <p>Goal of the project is to fit a model with given training data set and predict <code>classe</code> variable of the testing data set.</p>
 </div>
-<div id="algorithms-tested-for-better-accuracy" class="section level4">
-<h4>Algorithms Tested For better accuracy:</h4>
-<p>To achieve the goal models are trained using below mentioned algorithms. After repeated trials and tuning process, for our dataset, we found <code>RandomForest</code> to be working best after applying tuning controls.</p>
-<ul>
-<li>logistic regression model - GBM</li>
-<li>lda - linear discriminant analysis</li>
-<li>Naive Bayes</li>
-<li>Random Forest.</li>
-<li>Parallel Random Forest.</li>
-<li>Random Forest with tuning control.</li>
-<li>RPART - Recursive Partitioning and Regression Trees.</li>
-</ul>
+<div id="algorithms-testd-for-better-accuracy" class="section level2">
+<h2>Algorithms Testd For better accuracy</h2>
+<p>To achieve the goal, I have trained models using below algorithms. After repeated trials and tuning process, for our dataset, I found <code>RandomForest</code> to be working best after applying tuning controls. * logistic regression model - GBM * lda - linear discriminant analysis * Naive Bayes * Random Forest. * Parallel Random Forest. * Random Forest with tuning control.</p>
 </div>
-<div id="step-1-tweaking-machine-for-parallel-processing-to-improve-speed" class="section level4">
-<h4>Step 1: Tweaking machine for Parallel processing to improve speed</h4>
-<p><code>doParallel</code> library is used to implement parallel processing. 4 clusters were created to do parallel processing. Later these clusters are registered to use them for fitting algorithms.</p>
+<div id="step-1-tweaking-machine-for-parallel-processing-to-improve-speed." class="section level2">
+<h2>Step 1: Tweaking machine for Parallel processing to improve speed.</h2>
+<p>I have used doParallel library and made 4 clusters to do parallel processing. Later I registered these clusters to use them for fitting algorithms.</p>
 <pre><code>library(doParallel);
 rCluster &lt;- makePSOCKcluster(4);
 registerDoParallel(rCluster);</code></pre>
 </div>
-<div id="step-2-source-cleaning-and-processing-data" class="section level4">
-<h4>Step 2: Source, Cleaning and Processing Data</h4>
+<div id="step-2-source-cleaning-and-processing-data" class="section level2">
+<h2>Step 2: Source, Cleaning and Processing Data</h2>
 <p>Imported pml-training.csv into workspace and assigned those values to trainRawData variable. In further steps, I cleaned data by removing columns with NA’s from dataset. This is done to reduce the number of insignificant columns thereby improving the processing time and accuracy.</p>
 <pre><code>trainRawData &lt;- read.csv(&quot;pml-training.csv&quot;,na.strings=c(&quot;NA&quot;,&quot;&quot;));
-NAs &lt;- apply(trainRawData,2,function(x) {sum(is.na(x))});
 
+NAs &lt;- apply(trainRawData,2,function(x) {sum(is.na(x))});
 validData &lt;- trainRawData[,which(NAs == 0)];</code></pre>
 <p>After executing above code, we have received 60 variables are predictors.</p>
 </div>
-<div id="step-3-data-partitioning-for-training-and-testing" class="section level4">
-<h4>Step 3: Data Partitioning for Training and Testing</h4>
+<div id="step-3-data-partitioning-for-training-and-testing" class="section level2">
+<h2>Step 3: Data Partitioning for Training and Testing</h2>
 <p>To make efficient model, we need to train our model with 70% of given test data. Once model is prepared, it is always good to test it with rest 30% data to cross validate the predicted values against already existing values.</p>
 <pre><code>library(caret);
 trainIndex &lt;- createDataPartition(y = validData$classe, p=0.7,list=FALSE);
 trainData &lt;- validData[trainIndex,];</code></pre>
-<p>I have used caret createDataPartition method in caret package to split data into two sections.</p>
-<ul>
-<li>Training data - 70% of pml-training.csv</li>
-<li>Testing data - 30% of pml-training.csv</li>
-</ul>
+<p>I have used caret createDataPartition method in caret package to split data into two sections. * Training data - 70% of pml-training.csv * Testing data - 30% of pml-training.csv</p>
 <p>CreatedDataPartition functions gives indices of split data.</p>
 </div>
-<div id="step-4-further-cleaning" class="section level4">
-<h4>Step 4: Further Cleaning</h4>
+<div id="step-4-further-cleaning" class="section level2">
+<h2>Step 4: Further Cleaning</h2>
 <p>According to the details mentioned in <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a> it is understood that timestamps, username and other details are not highly significant in predicting the Classe variable of the dataset. So, accordingly, I have removed the irrelevant variables using Grep function.</p>
 <pre><code>removeIndex &lt;- grep(&quot;timestamp|X|user_name|new_window&quot;,names(trainData));
 trainData &lt;- trainData[,-removeIndex];</code></pre>
-<p>So, trainData would be our final dataset that we need to use for fitting a model which is accurate. After complete cleansing, we got trainData which has below details.</p>
-<ul>
-<li>13737 samples</li>
-<li>53 predictors</li>
-<li>5 classes: ‘A’, ‘B’, ‘C’, ‘D’, ‘E’</li>
-</ul>
+<p>So, trainData would be our final dataset that we need to use for fitting a model which is accurate. After complete cleansing, we got trainData which has below details. * 13737 samples * 53 predictors * 5 classes: ‘A’, ‘B’, ‘C’, ‘D’, ‘E’</p>
 </div>
-<div id="step-5-model-fitting" class="section level4">
-<h4>Step 5: Model Fitting</h4>
-<p>Random Forest algorithm is used to get highest accuracy with available 53 predictor variables. To control the training process, <code>trControl</code> function is used with Cross Validation as method and parallel processing also set to true.</p>
+<div id="step-5-model-fitting" class="section level2">
+<h2>Step 5: Model Fitting</h2>
+<p>I have used Random Forest as algorithm to get highest accuracy with available 53 predictor variables. To control the training process, trControl function is used with Cross Validation as method and parallel processing also set to true.</p>
 <pre><code>trControl = trainControl(method = &quot;cv&quot;, number = 4, allowParallel =TRUE);
 modFitRF &lt;- train(trainData$classe ~.,data = trainData,method=&quot;rf&quot;,trControl=trControl);</code></pre>
-<p>Aall variables are passed as predictor variables except classe to train function. Method is set to RandomForest and trainControl which we prepared in earlier step.</p>
+<p>I have passed all variables as predictor variable except classe to train function. Method is set to RandomForest and trainControl which we prepared in earlier step.</p>
 <p>This model fitting took approximately 45 minutes on a Windows Machine with 64 Bit Chipset, i5, 4 Gigabytes of Ram.</p>
 </div>
-<div id="step-6-model-details" class="section level4">
-<h4>Step 6: Model details</h4>
-<p>To look more into model, below commands are execute. Finally, Random Forest model resulted in 99.6% accurate at mtry 27. Thus this would be most efficient model in predicitng our test values.</p>
+<div id="step-6-model-details" class="section level2">
+<h2>Step 6: Model details</h2>
+<p>To look more into model, i excuted below command and found that this model is 99.6% accurate at mtry 27. Thus this would be most efficient model in predicitng our test values.</p>
 <pre><code>modFitRF;</code></pre>
 <pre><code>Random Forest 
 
@@ -157,117 +142,45 @@ Accuracy was used to select the optimal model using  the
  largest value.
 The final value used for the model was mtry = 27. </code></pre>
 </div>
-<div id="step-7-cross-validation" class="section level4">
-<h4>Step 7: Cross Validation</h4>
-<p>As we have plot the data into two sets, we have trained our model with training data. We have our model ready and we have to used rest 30% of data to test the model.</p>
-<div id="cleaning" class="section level5">
-<h5>Cleaning:</h5>
-<p>Same cleaning process is followed to prepare remaining 30% data for testing our model. Below are the steps for the same. Non-significant variables such as new_window, user name, timestamp were carefully removed to ignore noise and variance.</p>
+<div id="step-7-cross-validation" class="section level2">
+<h2>Step 7: Cross Validation</h2>
+<p>As we have splot the data into two sets, we have trained our model with training data. We have out model ready and we have to used rest 30% of data to test the model.</p>
+<div id="cleaning" class="section level3">
+<h3>Cleaning:</h3>
+<p>I have used same cleaning process which I did for the other 70% data set. Below are the steps for the same. I have carefully removed the non-significant variables such as new_window, user name, timestamp.</p>
 <pre><code>testData &lt;- validData[-trainIndex,];
 removeIndex &lt;- grep(&quot;timestamp|X|user_name|new_window&quot;,names(testData));
 testData &lt;- testData[,-removeIndex];</code></pre>
 </div>
-<div id="predicted-values" class="section level5">
-<h5>Predicted Values:</h5>
+<div id="predicted-values" class="section level3">
+<h3>Predicted Values:</h3>
 <p>Once we have final testing data set, I have used <code>Predict()</code> function to predict the <code>Classe</code> variable of the testing data set</p>
 <pre><code>predictedValues&lt;-predict(modFitRF,testData);</code></pre>
 </div>
-<div id="viewing-predicted-values" class="section level5">
-<h5>Viewing Predicted Values:</h5>
+<div id="viewing-predicted-values" class="section level3">
+<h3>Viewing Predicted Values:</h3>
 <p>Below code shows predicted values in a tabular format.</p>
 <pre><code>View(predictedValues);</code></pre>
 </div>
-<div id="accuracy-of-predictions" class="section level5">
-<h5>Accuracy of predictions:</h5>
-<p>As expected the predictions are not correct in all cases. We can calculate the accuracy of the prediction:</p>
-<pre><code>pRes &lt;- postResample(predictedValues, testData$classe)
-pRes</code></pre>
-<pre><code>## Accuracy    Kappa 
-##   0.9915   0.9893</code></pre>
-</div>
-<div id="expected-out-of-sample-error" class="section level5">
-<h5>Expected out of sample error:</h5>
-<p>We can calculate the expected out of sample error based on the test set that we created for cross-validation:</p>
-<pre><code>cfM &lt;- confusionMatrix(predictedValues, testData$classe)
-cfM</code></pre>
-<pre><code>## Confusion Matrix and Statistics
-## 
-##           Reference
-## Prediction    A    B    C    D    E
-##          A 4464   31    0    0   12
-##          B    0 2991   17    0    1
-##          C    0   15 2713   26    0
-##          D    0    0    7 2541   19
-##          E    0    0    0    5 2853
-## 
-## Overall Statistics
-##                                        
-##                Accuracy : 0.992        
-##                  95% CI : (0.99, 0.993)
-##     No Information Rate : 0.284        
-##     P-Value [Acc &gt; NIR] : &lt;2e-16       
-##                                        
-##                   Kappa : 0.989        
-##  Mcnemar's Test P-Value : NA           
-## 
-## Statistics by Class:
-## 
-##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity             1.000    0.985    0.991    0.988    0.989
-## Specificity             0.996    0.999    0.997    0.998    1.000
-## Pos Pred Value          0.990    0.994    0.985    0.990    0.998
-## Neg Pred Value          1.000    0.996    0.998    0.998    0.998
-## Prevalence              0.284    0.194    0.174    0.164    0.184
-## Detection Rate          0.284    0.191    0.173    0.162    0.182
-## Detection Prevalence    0.287    0.192    0.175    0.164    0.182
-## Balanced Accuracy       0.998    0.992    0.994    0.993    0.994</code></pre>
-<p>The expected out of sample error is: 0.8474 %</p>
-<p>Note: The confusionMatrix function from the Caret package does provide all the information that we calculated ‘by hand’ in the first part of the Cross-validation. It shows that both methods provide the same answer.</p>
-</div>
-</div>
-<div id="comparing-predicted-values-against-actual-classe-values-of-testing-data-set" class="section level4">
-<h4>Comparing predicted values against actual Classe values of testing data set:</h4>
-<p>To cross check the out come of prediction, I added these a column next to Classe for comparision. Further, I took comparision of both by equating them. Comparision column show us if the prediction we did is correct or not. Comparision values:</p>
-<p>TRUE - This means, actual value <code>classe</code> and predicted value <code>predictedValues</code> are same. Our model worked perfect for this case. FALSE - Actual value and predicted value are different. Model was not good enough to predict that particular case. But it’ll be difficult to check each and every row for TRUE or FALSE. So I took total count of case in each segment (TRUE or FALSE). I have used <code>length()</code> function to get total count.</p>
+<div id="comparing-predicted-values-against-actual-classe-values-of-testing-data-set" class="section level3">
+<h3>Comparing Predicted Values against Actual Classe values of testing data set:</h3>
+<p>To cross check the out come of prediction, I added these a column next to Classe for comparision. Further, I took comparision of both by equating them. Comparision column show us if the prediction we did is correct or not. Comparision values: TRUE - This means, actual value <code>classe</code> and predicted value <code>predictedValues</code> are same. Our model worked perfect for this case. FALSE - Actual value and predicted value are different. Model was not good enough to predict that particular case. But it’ll be difficult to check each and every row for TRUE or FALSE. So I took total count of case in each segment (TRUE or FALSE). I have used <code>length()</code> function to get total count.</p>
 <pre><code>testData$predictedValues&lt;-predictedValues;
 testData$Comparision&lt;-testData$predictedValues==testData$classe;
 
 length(testData$Comparision[testData$Comparision==FALSE]);
 length(testData$Comparision[testData$Comparision==TRUE]);</code></pre>
 </div>
-<div id="case-test-set-predictions" class="section level4">
-<h4>20 case test set predictions</h4>
-<p>Although not part of the project, we considered testing dataset to verify our predictive model. Below mentioned is the script verifies the testing data set and creates 20.txt files to verify each individually.</p>
-<pre><code>pml.testing &lt;- read.csv(&quot;pml-testing.csv&quot;, na.strings = c(&quot;NA&quot;, &quot;&quot;))
-pred2 &lt;- predict(modFitRF, testData$classe)
-pml.testing.2 &lt;- pml.testing
-pml.testing.2$classe &lt;- pred2
-
-pml_write_files = function(x) {
-    n = length(x)
-    for (i in 1:n) {
-        filename = paste0(&quot;problem_id_&quot;, i, &quot;.txt&quot;)
-        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
-            col.names = FALSE)
-    }
-}
-
-
-answers &lt;- pml.testing.2$classe
-
-pml_write_files(answers)
-answers</code></pre>
-</div>
-<div id="plotting-the-values" class="section level4">
-<h4>Plotting the values:</h4>
+<div id="plotting-the-values" class="section level3">
+<h3>Plotting the values:</h3>
 <p>To understand the data in much bettter way, we can even visualize the data using ggplot or qplot.</p>
 <pre><code>qplot(testData$classe,testData$predictedValues, color=testData$Comparision);</code></pre>
 <pre><code>qplot(length(testData$Classe), color=testData$Comparision);</code></pre>
 </div>
-<div id="conclusion" class="section level4">
-<h4>Conclusion:</h4>
-<p>Random Forest algorithm with tuning control method works best for our Weight Lifting exercise analysis.</p>
 </div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Random Forest algorithm works best for our Weight Lifting exercise analysis.</p>
 </div>
 
 
