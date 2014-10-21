@@ -1,6 +1,6 @@
-PracticalMachineLearning_WeightLiftingExerciseAnalysis
+Practical Machine Learning - Weight Lifting Exercise Analysis
 ------------------------------------------------------------
-PracticalMachineLearning - WeightLiftingExerciseAnalysis
+Practical Machine Learning - Weight Lifting Exercise Analysis
 
 
 This project deals with analysing existing data and developing predictive models using Algorithms(supervised learning) in CARET Package of R programming language. These models will be used to predict outcome of new data.
@@ -8,7 +8,9 @@ This project deals with analysing existing data and developing predictive models
 
 Description
 --------------------
-Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement. A group of enthusiasts took measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. 
+
+Goal of this project is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. Participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. This data was recorded at regular intervals. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
 
 Goal
 ----------------
@@ -24,6 +26,7 @@ To achieve the goal, I have trained models using below algorithms. After repeate
 * Random Forest.
 * Parallel Random Forest.
 * Random Forest with tuning control.
+* RPART - Recursive Partitioning and Regression Trees.
 
 Step 1: Tweaking machine for Parallel processing to improve speed.
 ----------------------------
@@ -153,8 +156,66 @@ Below code shows predicted values in a tabular format.
 View(predictedValues);
 ```
 
+###Accuracy of predictions:
+As expected the predictions are not correct in all cases. We can calculate the accuracy of the prediction:
+```
+pRes <- postResample(predictedValues, testData$classe)
+pRes
+```
 
-###Comparing Predicted Values against Actual Classe values of testing data set:
+```
+## Accuracy    Kappa 
+##   0.9915   0.9893
+```
+
+###Expected out of sample error
+We can calculate the expected out of sample error based on the test set that we created for cross-validation:
+
+```
+cfM <- confusionMatrix(predictedValues, testData$classe)
+cfM
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 4464   31    0    0   12
+##          B    0 2991   17    0    1
+##          C    0   15 2713   26    0
+##          D    0    0    7 2541   19
+##          E    0    0    0    5 2853
+## 
+## Overall Statistics
+##                                        
+##                Accuracy : 0.992        
+##                  95% CI : (0.99, 0.993)
+##     No Information Rate : 0.284        
+##     P-Value [Acc > NIR] : <2e-16       
+##                                        
+##                   Kappa : 0.989        
+##  Mcnemar's Test P-Value : NA           
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity             1.000    0.985    0.991    0.988    0.989
+## Specificity             0.996    0.999    0.997    0.998    1.000
+## Pos Pred Value          0.990    0.994    0.985    0.990    0.998
+## Neg Pred Value          1.000    0.996    0.998    0.998    0.998
+## Prevalence              0.284    0.194    0.174    0.164    0.184
+## Detection Rate          0.284    0.191    0.173    0.162    0.182
+## Detection Prevalence    0.287    0.192    0.175    0.164    0.182
+## Balanced Accuracy       0.998    0.992    0.994    0.993    0.994
+```
+
+The expected out of sample error is: 0.8474 %
+
+Note: The confusionMatrix function from the Caret package does provide all the information that we calculated 'by hand' in the first part of the Cross-validation. It shows that both methods provide the same answer.
+
+
+###Comparing Predicted values against actual Classe values of testing data set:
 To cross check the out come of prediction, I added these a column next to Classe for comparision. Further, I took comparision of both by equating them. Comparision column show us if the prediction we did is correct or not. 
 Comparision values:
 TRUE - This means, actual value `classe` and predicted value `predictedValues` are same. Our model worked perfect for this case.
@@ -170,7 +231,30 @@ length(testData$Comparision[testData$Comparision==FALSE]);
 length(testData$Comparision[testData$Comparision==TRUE]);
 ```
 
+###20 case test set predictions
+Although not part of the project, we considered testing dataset to verify our predictive model. Below mentioned is the script verifies the testing data set and creates 20.txt files to verify each individually.
 
+```
+pml.testing <- read.csv("pml-testing.csv", na.strings = c("NA", ""))
+pred2 <- predict(modFitRF, testData$classe)
+pml.testing.2 <- pml.testing
+pml.testing.2$classe <- pred2
+
+pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0("problem_id_", i, ".txt")
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
+
+
+answers <- pml.testing.2$classe
+
+pml_write_files(answers)
+answers
+```
 
 ###Plotting the values:
 
@@ -187,6 +271,6 @@ qplot(length(testData$Classe), color=testData$Comparision);
 
 Conclusion
 ------------------------
-Random Forest algorithm works best for our Weight Lifting exercise analysis.
+Random Forest algorithm with tuning control method works best for our Weight Lifting exercise analysis.
 
 
